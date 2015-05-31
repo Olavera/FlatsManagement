@@ -16,10 +16,10 @@ public class FlatsManagementApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        initializeInjector();
+        initializeDependencyInjector();
     }
 
-    private void initializeInjector() {
+    private void initializeDependencyInjector() {
         mAppComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .build();

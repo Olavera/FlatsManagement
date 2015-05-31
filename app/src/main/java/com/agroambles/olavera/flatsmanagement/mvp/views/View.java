@@ -5,7 +5,4 @@ package com.agroambles.olavera.flatsmanagement.mvp.views;
  */
 public interface View {
 
-    void initializePresenter();
-
-    void initializeDependencyInjector();
 }

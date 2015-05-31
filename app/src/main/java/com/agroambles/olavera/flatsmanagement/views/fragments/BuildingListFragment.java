@@ -10,11 +10,22 @@ import android.view.ViewGroup;
 
 import com.agroambles.olavera.flatsmanagement.FlatsManagementApplication;
 import com.agroambles.olavera.flatsmanagement.R;
+import com.agroambles.olavera.flatsmanagement.injector.components.DaggerBuildingListComponent;
 import com.agroambles.olavera.flatsmanagement.injector.modules.ActivityModule;
+import com.agroambles.olavera.flatsmanagement.injector.modules.BuildingListModule;
+import com.agroambles.olavera.flatsmanagement.mvp.presenters.BuildingListPresenter;
+import com.agroambles.olavera.flatsmanagement.mvp.views.BuildingListView;
 
-public class BuildingListFragment extends Fragment {
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+
+public class BuildingListFragment extends Fragment implements BuildingListView {
 
     private OnFragmentInteractionListener mListener;
+
+    @Inject
+    BuildingListPresenter mBuildingListPresenter;
 
     public static BuildingListFragment newInstance() {
         BuildingListFragment fragment = new BuildingListFragment();
@@ -35,8 +46,13 @@ public class BuildingListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_building_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_building_list, container, false);
+        ButterKnife.inject(this, view);
+
+        initializeDependencyInjector();
+        initializePresenter();
+
+        return view;
     }
 
     @Override
@@ -51,6 +67,18 @@ public class BuildingListFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mBuildingListPresenter.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mBuildingListPresenter.onStop();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -58,6 +86,8 @@ public class BuildingListFragment extends Fragment {
 
     private void initializePresenter() {
         mBuildingListPresenter.attachView(this);
+        mBuildingListPresenter.attachIncomingIntent(getArguments());
+        mBuildingListPresenter.initializePresenter();
     }
 
     private void initializeDependencyInjector() {
@@ -67,7 +97,7 @@ public class BuildingListFragment extends Fragment {
 
         DaggerBuildingListComponent.builder()
                 .appComponent(avengersApplication.getAppComponent())
-                .activityModule(new ActivityModule(this))
+                .activityModule(new ActivityModule(getActivity()))
                 .buildingListModule(new BuildingListModule())
                 .build().inject(this);
     }
