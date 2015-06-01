@@ -3,33 +3,39 @@ package com.agroambles.olavera.flatsmanagement.views.fragments;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.app.Fragment;
-import android.widget.Button;
 
 import com.agroambles.olavera.flatsmanagement.FlatsManagementApplication;
 import com.agroambles.olavera.flatsmanagement.R;
 import com.agroambles.olavera.flatsmanagement.injector.components.DaggerBuildingListComponent;
 import com.agroambles.olavera.flatsmanagement.injector.modules.ActivityModule;
 import com.agroambles.olavera.flatsmanagement.injector.modules.BuildingListModule;
+import com.agroambles.olavera.flatsmanagement.model.entities.Building;
 import com.agroambles.olavera.flatsmanagement.mvp.presenters.BuildingListPresenter;
 import com.agroambles.olavera.flatsmanagement.mvp.views.BuildingListView;
+import com.agroambles.olavera.flatsmanagement.views.adapters.BuildingListAdapter;
+import com.agroambles.olavera.flatsmanagement.views.utils.DividerItemDecoration;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class BuildingListFragment extends Fragment implements BuildingListView {
+public class BuildingListFragment extends Fragment implements BuildingListView,
+        BuildingListAdapter.BuildingListAdapterCallbacks {
 
     private OnBuildingListFragmentListener mListener;
 
     @Inject
     BuildingListPresenter mBuildingListPresenter;
-    @InjectView(R.id.blacklist_rlv)
+    @InjectView(R.id.rv_building_list)
     RecyclerView mBuildingListRecyclerView;
     private BuildingListAdapter mBuildingListAdapter;
     private ProgressDialog mLoadingProgressDialog;
@@ -48,6 +54,7 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -57,6 +64,8 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
         ButterKnife.inject(this, view);
 
         initializeDependencyInjector();
+        initializeProgressDialog();
+        initializeBuildingListRecyclerView();
         initializePresenter();
 
         return view;
@@ -67,7 +76,7 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
         super.onAttach(activity);
         try {
             mListener = (OnBuildingListFragmentListener) activity;
-            mListener.onSectionAttached(getString(R.string.section_buildinglist));
+            mListener.onSectionAttached(getString(R.string.str_section_building_list));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -92,14 +101,7 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
         mListener = null;
     }
 
-    private void initializePresenter() {
-        mBuildingListPresenter.attachView(this);
-        mBuildingListPresenter.attachBundle(getArguments());
-        mBuildingListPresenter.initializePresenter();
-    }
-
     private void initializeDependencyInjector() {
-
         FlatsManagementApplication avengersApplication =
                 (FlatsManagementApplication) getActivity().getApplication();
 
@@ -108,6 +110,52 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
                 .activityModule(new ActivityModule(getActivity()))
                 .buildingListModule(new BuildingListModule())
                 .build().inject(this);
+    }
+
+    private void initializeProgressDialog(){
+        mLoadingProgressDialog = new ProgressDialog(getActivity());
+        mLoadingProgressDialog.setCancelable(false);
+        mLoadingProgressDialog.setMessage(getString(R.string.str_loading));
+    }
+
+    private void initializeBuildingListRecyclerView () {
+        //recyclerView.setHasFixedSize(true);
+
+        // RecyclerView layout manager
+        mBuildingListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mBuildingListRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
+                DividerItemDecoration.VERTICAL_LIST));
+
+        // RecyclerView adapter
+        mBuildingListAdapter = new BuildingListAdapter(this);
+        mBuildingListRecyclerView.setAdapter(mBuildingListAdapter);
+    }
+
+    private void initializePresenter() {
+        mBuildingListPresenter.attachView(this);
+        mBuildingListPresenter.attachBundle(getArguments());
+        mBuildingListPresenter.initializePresenter();
+    }
+
+    @Override
+    public void OnItemClick(int position) {
+
+    }
+
+    @Override
+    public void startLoading() {
+        mLoadingProgressDialog.show();
+    }
+
+    @Override
+    public void stopLoading() {
+        mLoadingProgressDialog.dismiss();
+    }
+
+    @Override
+    public void showList(List<Building> buildings) {
+        mBuildingListAdapter.appendList(buildings);
     }
 
     public interface OnBuildingListFragmentListener {

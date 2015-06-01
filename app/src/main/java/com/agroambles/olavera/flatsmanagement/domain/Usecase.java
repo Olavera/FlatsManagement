@@ -1,12 +1,11 @@
 package com.agroambles.olavera.flatsmanagement.domain;
 
-import rx.Subscriber;
-import rx.Subscription;
+import rx.Observable;
 
 /**
  * @author Olavera
  */
-public interface Usecase {
+public interface Usecase<T> {
 
-    Subscription execute(Subscriber subscriber);
+    Observable<T> execute();
 }

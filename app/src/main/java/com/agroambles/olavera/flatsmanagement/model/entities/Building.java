@@ -5,13 +5,23 @@ package com.agroambles.olavera.flatsmanagement.model.entities;
  */
 public class Building {
 
+    private long id;
     private String name;
 
     public Building() {
     }
 
-    public Building(String name) {
+    public Building(long id, String name) {
+        this.id = id;
         this.name = name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {

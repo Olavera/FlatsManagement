@@ -2,7 +2,7 @@ package com.agroambles.olavera.flatsmanagement.injector.modules;
 
 import com.agroambles.olavera.flatsmanagement.FlatsManagementApplication;
 import com.agroambles.olavera.flatsmanagement.model.Repository;
-import com.agroambles.olavera.flatsmanagement.model.rest.RestRepository;
+import com.agroambles.olavera.flatsmanagement.model.rest.RestFakeRepository;
 
 import javax.inject.Singleton;
 
@@ -29,7 +29,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    Repository provideDataRepository (RestRepository restRepository) {
+    Repository provideDataRepository (RestFakeRepository restRepository) {
         return restRepository;
     }
 }

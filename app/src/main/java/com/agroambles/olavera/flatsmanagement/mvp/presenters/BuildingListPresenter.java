@@ -1,6 +1,5 @@
 package com.agroambles.olavera.flatsmanagement.mvp.presenters;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.agroambles.olavera.flatsmanagement.domain.GetBuildingListUsecase;
@@ -12,15 +11,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import rx.Subscriber;
+import rx.Subscription;
 
 /**
  * @author Olavera
  */
-public class BuildingListPresenter extends Subscriber<List<Building>> implements Presenter {
+public class BuildingListPresenter implements Presenter {
 
     private BuildingListView mBuildingListView;
     private final GetBuildingListUsecase mGetBuildingListUsecase;
+    private Subscription mBuildingListSubscription;
 
     @Inject
     public BuildingListPresenter(GetBuildingListUsecase getBuildingListUsecase) {
@@ -34,7 +34,8 @@ public class BuildingListPresenter extends Subscriber<List<Building>> implements
 
     @Override
     public void onStop() {
-
+        if (!mBuildingListSubscription.isUnsubscribed())
+            mBuildingListSubscription.unsubscribe();
     }
 
     @Override
@@ -50,21 +51,27 @@ public class BuildingListPresenter extends Subscriber<List<Building>> implements
     @Override
     public void initializePresenter() {
         mBuildingListView.startLoading();
-        mGetBuildingListUsecase.execute(this);
+        mBuildingListSubscription = mGetBuildingListUsecase.execute().subscribe(
+                // On Next
+                (list) ->  { onNext(list); },
+                // On Error
+                (throwable) -> { onError(throwable); },
+                // On Complete
+                () -> { onComplete(); }
+        );
     }
 
-    @Override
-    public void onCompleted() {
+    private void onNext(List<Building> buildings) {
+        mBuildingListView.showList(buildings);
+    }
+
+    private void onError(Throwable e) {
+
+    }
+
+    private void onComplete() {
         mBuildingListView.stopLoading();
     }
 
-    @Override
-    public void onError(Throwable e) {
 
-    }
-
-    @Override
-    public void onNext(List<Building> buildings) {
-        mBuildingListView.showList(buildings);
-    }
 }
