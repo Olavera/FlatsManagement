@@ -1,12 +1,14 @@
 package com.agroambles.olavera.flatsmanagement.views.fragments;
 
 import android.app.Activity;
-import android.net.Uri;
+import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.support.v4.app.Fragment;
+import android.widget.Button;
 
 import com.agroambles.olavera.flatsmanagement.FlatsManagementApplication;
 import com.agroambles.olavera.flatsmanagement.R;
@@ -19,13 +21,18 @@ import com.agroambles.olavera.flatsmanagement.mvp.views.BuildingListView;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 public class BuildingListFragment extends Fragment implements BuildingListView {
 
-    private OnFragmentInteractionListener mListener;
+    private OnBuildingListFragmentListener mListener;
 
     @Inject
     BuildingListPresenter mBuildingListPresenter;
+    @InjectView(R.id.blacklist_rlv)
+    RecyclerView mBuildingListRecyclerView;
+    private BuildingListAdapter mBuildingListAdapter;
+    private ProgressDialog mLoadingProgressDialog;
 
     public static BuildingListFragment newInstance() {
         BuildingListFragment fragment = new BuildingListFragment();
@@ -59,7 +66,8 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnBuildingListFragmentListener) activity;
+            mListener.onSectionAttached(getString(R.string.section_buildinglist));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -86,7 +94,7 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
 
     private void initializePresenter() {
         mBuildingListPresenter.attachView(this);
-        mBuildingListPresenter.attachIncomingIntent(getArguments());
+        mBuildingListPresenter.attachBundle(getArguments());
         mBuildingListPresenter.initializePresenter();
     }
 
@@ -102,9 +110,9 @@ public class BuildingListFragment extends Fragment implements BuildingListView {
                 .build().inject(this);
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface OnBuildingListFragmentListener {
 
-        public void onFragmentInteraction(Uri uri);
+        void onSectionAttached(String title);
     }
 
 }

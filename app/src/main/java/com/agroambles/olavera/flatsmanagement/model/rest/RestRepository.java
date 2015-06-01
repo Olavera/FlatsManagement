@@ -1,13 +1,17 @@
 package com.agroambles.olavera.flatsmanagement.model.rest;
 
 import com.agroambles.olavera.flatsmanagement.model.Repository;
+import com.agroambles.olavera.flatsmanagement.model.entities.Building;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import rx.Observable;
 
 /**
  * @author Olavera
@@ -23,13 +27,14 @@ public class RestRepository implements Repository {
 //                .registerTypeAdapterFactory(new CharacterItemAdapterFactory())
 //                .create();
 
-        RestAdapter marvelApiAdapter = new RestAdapter.Builder()
-                .setEndpoint(RestApi.END_POINT)
-                .setLogLevel(RestAdapter.LogLevel.HEADERS_AND_ARGS)
                 //.setConverter(new GsonConverter(gson))
-                .build();
 
-        mRestApi = marvelApiAdapter.create(RestApi.class);
+        mRestApi = RestServiceGenerator.createService(RestApi.class, RestApi.END_POINT,
+                5, 20, "", "");
+    }
 
+    @Override
+    public Observable<List<Building>> getBuildingList() {
+        return mRestApi.getBuildingList();
     }
 }

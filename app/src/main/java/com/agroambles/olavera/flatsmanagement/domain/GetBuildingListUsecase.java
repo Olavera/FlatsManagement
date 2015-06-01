@@ -6,6 +6,8 @@ import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * @author Olavera
@@ -21,6 +23,11 @@ public class GetBuildingListUsecase implements Usecase {
 
     @Override
     public Subscription execute(Subscriber subscriber) {
-        return null;
+        Subscription subscription = mRepository.getBuildingList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
+
+        return subscription;
     }
 }

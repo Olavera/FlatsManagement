@@ -15,7 +15,7 @@ public interface Presenter {
 
     void attachView (View v);
 
-    void attachIncomingIntent (Bundle bundle);
+    void attachBundle(Bundle bundle);
 
     void initializePresenter();
 }
