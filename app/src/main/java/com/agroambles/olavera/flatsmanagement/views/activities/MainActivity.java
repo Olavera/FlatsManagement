@@ -10,15 +10,17 @@ import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
 import com.agroambles.olavera.flatsmanagement.R;
-import com.agroambles.olavera.flatsmanagement.views.SectionsConstants;
+import com.agroambles.olavera.flatsmanagement.views.Constants;
 import com.agroambles.olavera.flatsmanagement.views.fragments.BuildingListFragment;
+import com.agroambles.olavera.flatsmanagement.views.fragments.FlatListFragment;
+import com.agroambles.olavera.flatsmanagement.views.fragments.FragmentCallbacks;
+import com.agroambles.olavera.flatsmanagement.views.Sections;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        BuildingListFragment.OnBuildingListFragmentListener {
+        implements FragmentCallbacks {
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
@@ -39,26 +41,6 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer, mDrawerLayout);
-    }
-
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = null;
-        switch(position){
-            case SectionsConstants.BUILDING_LIST:
-                fragment = BuildingListFragment.newInstance();
-                break;
-            default:
-                break;
-        }
-        if(fragment!=null){
-            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
-        }
-    }
-
-    public void onSectionAttached(String title) {
-        mTitle = title;
     }
 
     public void restoreActionBar() {
@@ -82,5 +64,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSectionAttached(String title) {
+        mTitle = title;
+    }
+
+    @Override
+    public void switchFragment(Sections section, Bundle bundle) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = null;
+        switch(section){
+            case BUILDING_LIST_FRAGMENT:
+                fragment = BuildingListFragment.newInstance();
+                break;
+            case FLAT_LIST_FRAGMENT:
+                long buildingId = bundle.getLong(Constants.BUILDING_ID, -1);
+                if(buildingId!=-1) {
+                    fragment = FlatListFragment.newInstance(buildingId);
+                }
+                break;
+            default:
+                break;
+        }
+        if(fragment!=null){
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        }
     }
 }

@@ -3,7 +3,7 @@ package com.agroambles.olavera.flatsmanagement.views;
 /**
  * @author Olavera
  */
-public class SectionsConstants {
+public class Constants {
 
-    public static final int BUILDING_LIST = 0;
+    public static final String BUILDING_ID = "build_id";
 }

@@ -18,6 +18,8 @@ import com.agroambles.olavera.flatsmanagement.injector.modules.BuildingListModul
 import com.agroambles.olavera.flatsmanagement.model.entities.Building;
 import com.agroambles.olavera.flatsmanagement.mvp.presenters.BuildingListPresenter;
 import com.agroambles.olavera.flatsmanagement.mvp.views.BuildingListView;
+import com.agroambles.olavera.flatsmanagement.views.Constants;
+import com.agroambles.olavera.flatsmanagement.views.Sections;
 import com.agroambles.olavera.flatsmanagement.views.adapters.BuildingListAdapter;
 import com.agroambles.olavera.flatsmanagement.views.utils.DividerItemDecoration;
 
@@ -31,7 +33,7 @@ import butterknife.InjectView;
 public class BuildingListFragment extends Fragment implements BuildingListView,
         BuildingListAdapter.BuildingListAdapterCallbacks {
 
-    private OnBuildingListFragmentListener mListener;
+    private FragmentCallbacks mListener;
 
     @Inject
     BuildingListPresenter mBuildingListPresenter;
@@ -75,7 +77,7 @@ public class BuildingListFragment extends Fragment implements BuildingListView,
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnBuildingListFragmentListener) activity;
+            mListener = (FragmentCallbacks) activity;
             mListener.onSectionAttached(getString(R.string.str_section_building_list));
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -140,7 +142,9 @@ public class BuildingListFragment extends Fragment implements BuildingListView,
 
     @Override
     public void OnItemClick(int position) {
-
+        Bundle bundle = new Bundle();
+        bundle.putLong(Constants.BUILDING_ID, mBuildingListAdapter.getItemId(position));
+        mListener.switchFragment(Sections.FLAT_LIST_FRAGMENT, bundle);
     }
 
     @Override
@@ -156,11 +160,6 @@ public class BuildingListFragment extends Fragment implements BuildingListView,
     @Override
     public void showList(List<Building> buildings) {
         mBuildingListAdapter.appendList(buildings);
-    }
-
-    public interface OnBuildingListFragmentListener {
-
-        void onSectionAttached(String title);
     }
 
 }
